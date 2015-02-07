@@ -14,14 +14,10 @@ begin
   calc_type  = gets.chomp
 
   case calc_type
-    when "1"
-      answer = number1.to_i + number2.to_i
-    when "2"
-      answer = number1.to_i - number2.to_i
-    when "3"
-      answer = number1.to_i * number2.to_i
-    when "4"
-      answer = number1.to_f / number2.to_f
+    when "1" then answer = number1.to_i + number2.to_i
+    when "2" then answer = number1.to_i - number2.to_i
+    when "3" then answer = number1.to_i * number2.to_i
+    when "4" then answer = number1.to_f / number2.to_f
   end
 
   say "That equals #{answer}!"
