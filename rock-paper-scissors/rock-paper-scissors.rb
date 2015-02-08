@@ -2,6 +2,10 @@ def say(message)
   puts "=> #{message}"
 end
 
+say "Welcome to the Rock, Paper, Scissors game!"
+say "It's the normal rules - rock beats scissors, scissors beat paper, and"
+say "paper beats rock. Have fun!"
+
 begin
 
   # User pick
