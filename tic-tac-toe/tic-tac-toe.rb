@@ -1,21 +1,3 @@
-# draw board
-# 1 user choice, redraw
-# 2 computer choice
-# 3 user choice
-# 4 computer choice
-# 5 user choice, win check
-# 6 computer choice, win check
-# 7 user choice, win check
-# 8 computer choice, win check
-# 9 user choice, win check
-# tie, end game
-
-
-board = {
-  13 => 1, 23 => 2, 33 => 3, 
-  12 => 4, 22 => 5, 32 => 6, 
-  11 => 7, 21 => 8, 31 => 9
-}
 
 def draw_board(board)
   puts "-------------"
@@ -30,30 +12,30 @@ end
 def ask_user_for_position(board)
   puts "=> Where do you want to go next?"
   user_choice = gets.chomp
-  #until board.include?(user_choice.to_i)
-  #  puts "=> That's not a valid entry. Please select a number from 1 to 9."
-  #  user.choice = gets.chomp
-  #end
+  valid_positions = get_available_positions(board)
+  until valid_positions.include?(board.key(user_choice.to_i))
+    puts "=> Thats not a valid entry. Please enter a number for an available spot."
+    user_choice = gets.chomp
+  end
+  return user_choice
 end
 
 def get_computer_pick(board)
-  computer_pick = board[get_available_positions(board).sample]
+  board[get_available_positions(board).sample]
 end
 
 def get_available_positions(board)
   available_positions = []
   board.each do |position, value|
-    available_positions << position unless ["X", "O"].include?(value)
+    available_positions << position unless ["X", "o"].include?(value)
   end
   available_positions
 end
 
 def add_turn_to_board(player, position, board)
-  puts "board: #{board}"
-  x_or_o = {"user" => "X", "computer" => "O"}
+  x_or_o = {"user" => "X", "computer" => "o"}
   board[board.key(position)] = x_or_o[player]
-  puts "board after: #{board}"
-  board
+  return board
 end
 
 def get_user_positions(board)
@@ -65,7 +47,7 @@ end
 def get_computer_positions(board)
   computer_positions = []
   board.each do |position, value| 
-    computer_positions << position if value == "O"
+    computer_positions << position if value == "o"
   end
   computer_positions
 end
@@ -80,40 +62,60 @@ def did_player_win?(player, board)
   player_positions = get_computer_positions(board) if player == "computer"
   winning_combinations.each do |combination|
     if (combination & player_positions) == combination
-      puts "#{player} won!"
+      return true
     end
   end
+  return nil
 end
 
-#first round
-draw_board(board)
-user_choice = ask_user_for_position(board)
-board = add_turn_to_board("user", user_choice.to_i, board)
-computer_choice = get_computer_pick(board)
-puts "Computer chose #{computer_choice}"
-board = add_turn_to_board("computer", computer_choice, board)
 
-# second round
-draw_board(board)
-user_choice = ask_user_for_position(board)
-board = add_turn_to_board("user", user_choice.to_i, board)
-computer_choice = get_computer_pick(board)
-puts "Computer chose #{computer_choice}"
-board = add_turn_to_board("computer", computer_choice, board)
+begin
+  puts "=> Welcome to tic-tac-toe. You are 'X' and computer is 'o'."
+  board = {
+  13 => 1, 23 => 2, 33 => 3, 
+  12 => 4, 22 => 5, 32 => 6, 
+  11 => 7, 21 => 8, 31 => 9
+  }
+  turn_count = 0
+  win = nil
 
-# third round
-draw_board(board)
-user_choice = ask_user_for_position(board)
-board = add_turn_to_board("user", user_choice.to_i, board)
-did_player_win?("user", board)
-computer_choice = get_computer_pick(board)
-puts "Computer chose #{computer_choice}"
-did_player_win?("computer", board)
-board = add_turn_to_board("computer", computer_choice, board)
+  begin
+    # user's turn
+    draw_board(board)
+    user_choice = ask_user_for_position(board)
+    board = add_turn_to_board("user", user_choice.to_i, board)
+    win = did_player_win?("user", board)
+    if win
+      puts "=> You won!"
+      break
+    end
+    turn_count += 1
+    if turn_count >= 9
+      puts "=> It's a tie."
+      break
+    end
 
-# It needs to stop when you win.
-# It needs to keep going if noone has won yet.
+    # computer's turn
+    computer_choice = get_computer_pick(board)
+    puts "=> Computer chose #{computer_choice}"
+    board = add_turn_to_board("computer", computer_choice, board)
+    win = did_player_win?("computer", board)
+    if win
+      draw_board(board)
+      puts "=> You lost. Better luck next time."
+      break
+    end
+    turn_count += 1
 
-
-
-
+  end until turn_count >= 9
+  
+  # Check if the user wants to play again
+  puts "=> Would you like to play again? (Type 'yes' or 'no')."
+  play_again = gets.chomp
+  until ['yes', 'no'].include?(play_again.downcase)
+    puts "=> Thats not a valid entry. Please type 'yes' or 'no'."
+    play_again = gets.chomp
+  end
+  
+end until play_again.downcase == 'no'
+puts "=> Thanks for playing!"
