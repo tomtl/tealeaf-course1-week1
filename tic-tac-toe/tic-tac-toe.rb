@@ -10,7 +10,6 @@
 # 9 user choice, win check
 # tie, end game
 
-require 'pry'
 
 board = {
   13 => 1, 23 => 2, 33 => 3, 
@@ -37,9 +36,23 @@ def ask_user_for_position(board)
   #end
 end
 
+def get_computer_pick(board)
+  computer_pick = board[get_available_positions(board).sample]
+end
+
+def get_available_positions(board)
+  available_positions = []
+  board.each do |position, value|
+    available_positions << position unless ["X", "O"].include?(value)
+  end
+  available_positions
+end
+
 def add_turn_to_board(player, position, board)
-  x_or_o = {"player" => "X", "computer" => "O"}
-  board[position] = x_or_o[player]
+  puts "board: #{board}"
+  x_or_o = {"user" => "X", "computer" => "O"}
+  board[board.key(position)] = x_or_o[player]
+  puts "board after: #{board}"
   board
 end
 
@@ -57,17 +70,50 @@ def get_computer_positions(board)
   computer_positions
 end
   
-def did_player_win?(player_positions)
-  winning_combinations = [[11, 12, 13], [21, 22, 23], [31, 32, 33]]
+def did_player_win?(player, board)
+  winning_combinations = [
+    [11, 12, 13], [21, 22, 23], [31, 32, 33], # verticals
+    [11, 21, 31], [12, 22, 32], [13, 23, 33], # horizontals
+    [11, 22, 33], [13, 22, 31]                # diagonals
+  ]
+  player_positions = get_user_positions(board) if player == "user"
+  player_positions = get_computer_positions(board) if player == "computer"
   winning_combinations.each do |combination|
     if (combination & player_positions) == combination
-      return True
+      puts "#{player} won!"
     end
   end
 end
 
+#first round
 draw_board(board)
 user_choice = ask_user_for_position(board)
 board = add_turn_to_board("user", user_choice.to_i, board)
+computer_choice = get_computer_pick(board)
+puts "Computer chose #{computer_choice}"
+board = add_turn_to_board("computer", computer_choice, board)
+
+# second round
+draw_board(board)
+user_choice = ask_user_for_position(board)
+board = add_turn_to_board("user", user_choice.to_i, board)
+computer_choice = get_computer_pick(board)
+puts "Computer chose #{computer_choice}"
+board = add_turn_to_board("computer", computer_choice, board)
+
+# third round
+draw_board(board)
+user_choice = ask_user_for_position(board)
+board = add_turn_to_board("user", user_choice.to_i, board)
+did_player_win?("user", board)
+computer_choice = get_computer_pick(board)
+puts "Computer chose #{computer_choice}"
+did_player_win?("computer", board)
+board = add_turn_to_board("computer", computer_choice, board)
+
+# It needs to stop when you win.
+# It needs to keep going if noone has won yet.
+
+
 
 
