@@ -35,7 +35,7 @@ end
 def add_turn_to_board(player, position, board)
   x_or_o = {"user" => "X", "computer" => "o"}
   board[board.key(position)] = x_or_o[player]
-  return board
+  board
 end
 
 def get_user_positions(board)
@@ -65,7 +65,7 @@ def did_player_win?(player, board)
       return true
     end
   end
-  return nil
+  nil
 end
 
 
@@ -85,11 +85,14 @@ begin
     user_choice = ask_user_for_position(board)
     board = add_turn_to_board("user", user_choice.to_i, board)
     win = did_player_win?("user", board)
+
     if win
       puts "=> You won!"
       break
     end
+
     turn_count += 1
+
     if turn_count >= 9
       puts "=> It's a tie."
       break
