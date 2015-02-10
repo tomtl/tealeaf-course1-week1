@@ -20,10 +20,6 @@ def ask_user_for_position(board)
   return user_choice
 end # returns a board[value] like '1'
 
-def get_computer_pick(board)
-  board[get_available_positions(board).sample]
-end # returns a board[value] like '1'
-
 def get_computer_pick_with_ai(board)
   winning_combinations = [
     [11, 12, 13], [21, 22, 23], [31, 32, 33], # verticals
