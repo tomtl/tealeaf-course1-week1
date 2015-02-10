@@ -18,11 +18,41 @@ def ask_user_for_position(board)
     user_choice = gets.chomp
   end
   return user_choice
-end
+end # returns a board[value] like '1'
 
 def get_computer_pick(board)
   board[get_available_positions(board).sample]
-end
+end # returns a board[value] like '1'
+
+def get_computer_pick_with_ai(board)
+  winning_combinations = [
+    [11, 12, 13], [21, 22, 23], [31, 32, 33], # verticals
+    [11, 21, 31], [12, 22, 32], [13, 23, 33], # horizontals
+    [11, 22, 33], [13, 22, 31]                # diagonals
+  ]
+  user_positions = get_user_positions(board)
+  computer_positions = get_computer_positions(board)
+  
+  needed_for_win = []
+  winning_combinations.each do |combo| 
+    needed_for_win << (combo - computer_positions)
+  end
+  
+  possible_win_combos = []
+  needed_for_win.each do |combo| 
+    possible_win_combos << combo if (combo & user_positions).empty?
+  end
+  
+  combo_lengths = []
+  possible_win_combos.each { |combo| combo_lengths << combo.length }
+  
+  best_combos = []
+  possible_win_combos.each do |combo| 
+    best_combos << combo if combo.length == combo_lengths.min
+  end
+  
+  board[best_combos.sample.sample]
+end # Returns a board[value] like '1'
 
 def get_available_positions(board)
   available_positions = []
@@ -30,7 +60,7 @@ def get_available_positions(board)
     available_positions << position unless ["X", "o"].include?(value)
   end
   available_positions
-end
+end # Returns a board[key] like '11'
 
 def add_turn_to_board(player, position, board)
   x_or_o = {"user" => "X", "computer" => "o"}
@@ -42,7 +72,7 @@ def get_user_positions(board)
   user_positions = []
   board.each { |position, value| user_positions << position if value == "X" }
   user_positions
-end
+end # returns an array of board[keys] like '[11, 12, 13]'
 
 def get_computer_positions(board)
   computer_positions = []
@@ -50,7 +80,7 @@ def get_computer_positions(board)
     computer_positions << position if value == "o"
   end
   computer_positions
-end
+end # returns an array of board[keys] like '[11, 12, 13]'
   
 def did_player_win?(player, board)
   winning_combinations = [
@@ -66,7 +96,7 @@ def did_player_win?(player, board)
     end
   end
   nil
-end
+end # returns true or nil
 
 
 begin
@@ -99,7 +129,7 @@ begin
     end
 
     # computer's turn
-    computer_choice = get_computer_pick(board)
+    computer_choice = get_computer_pick_with_ai(board)
     puts "=> Computer chose #{computer_choice}"
     board = add_turn_to_board("computer", computer_choice, board)
     win = did_player_win?("computer", board)
