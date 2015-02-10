@@ -19,9 +19,23 @@ def create_deck
 end # returns deck as array like [1, 2, 3].
 
 def deal_card(deck)
-  card = deck.delete_at(rand(deck.length))
+  deck.delete_at(rand(deck.length))
 end # returns one card value like '1' or 'K'.
 
+def get_card_value(card)
+  card_values = {}
+  (1..9).each { |number| card_values[number] = number }
+  ["J", "Q", "K"].each { |letter| card_values[letter] = 10 }
+  card_values["A"] = 11
+  card_values
+end
+
+def get_hand_value(cards)
+  value = 0
+  cards.each { |card| value += card_values[card] }
+  value
+  # if value ace and over 21, subtract 10
+end # returns the numerical value of hand, eg: 17.
 
 create_deck
 
@@ -42,5 +56,8 @@ puts "=> Dealer's first card is a #{dealer_cards[0]}"
 begin
   puts "=> Would you like to hit? (y/n)"
   hit = gets.chomp
-  
+  break if hit == 'y'
+  player_cards << deal_card(deck)
+  puts "Now your cards are #{player_cards}, which equals #{get_hand_value(cards)}."
+  # check value of player's cards, win/bust if 21 >.
 end while hit == "y"
