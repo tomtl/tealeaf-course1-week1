@@ -33,84 +33,98 @@ def get_hand_value(cards)
   value
 end # returns the numerical value of hand, eg: 17.
 
-
-puts "=> Welcome to Blackjack! Let's get started."
-
-deck = create_deck
-
-# initial deal
-player_cards = []
-dealer_cards = []
-2.times do
-  player_cards << deal_card(deck)
-  dealer_cards << deal_card(deck)
-end
-
-# show user cards
-players_hand = get_hand_value(player_cards)
-puts "=> You have a #{player_cards[0]} and a #{player_cards[1]} which equals #{players_hand}."
-puts "=> Dealer's first card is a #{dealer_cards[0]}"
-
-if players_hand == 21
-  puts "Blackjack - You win!"
-end
-
-# ask if user wants to hit
 begin
-  break if players_hand == 21
-  puts "=> Would you like to hit? (y/n)"
-  hit = gets.chomp
-  break if hit == 'n'
-  
-  player_cards << deal_card(deck)
-  players_hand = get_hand_value(player_cards)
-  puts "=> Now your cards are #{player_cards}, which equals #{players_hand}."
-  
-  if players_hand == 21
-    puts "=> You win with 21!"
-    break
+  puts "=> Welcome to Blackjack! Let's get started."
+
+  deck = create_deck
+
+  # initial deal
+  player_cards = []
+  dealer_cards = []
+  2.times do
+    player_cards << deal_card(deck)
+    dealer_cards << deal_card(deck)
   end
-  
-  if players_hand > 21
-    puts "=> Bust. You lost."
-    break
+
+  puts "=> You have a #{player_cards[0]} and a #{player_cards[1]} which equals #{get_hand_value(player_cards)}."
+  puts "=> Dealer's first card is a #{dealer_cards[0]}"
+
+  if get_hand_value(player_cards) == 21
+    puts "Blackjack - You win!"
   end
+
+  # user's turn
+  begin
+    break if get_hand_value(player_cards) == 21
+    puts "=> Would you like to hit? (y/n)"
+    
+    hit = gets.chomp
+    until ['y', 'n'].include?(hit.downcase)
+      puts "=> That's not a valid entry. Please type 'y' or 'n'."
+      hit = gets.chomp
+    end
+    break if hit == 'n'
   
-end until hit == "n"
+    player_cards << deal_card(deck)
+    puts "=> Now your cards are #{player_cards}, which equals #{get_hand_value(player_cards)}."
+  
+    if get_hand_value(player_cards) == 21
+      puts "=> You win with 21!"
+      break
+    end
+  
+    if get_hand_value(player_cards) > 21
+      puts "=> Bust. You lost."
+      break
+    end
+  
+  end until hit == "n"
  
 
-# dealer's turn
-begin
+  # dealer's turn
   puts "=> Dealer's cards are #{dealer_cards} which equals #{get_hand_value(dealer_cards)}."
-  break if get_hand_value(player_cards) >= 21
-  
-  if get_hand_value(dealer_cards) < 17
-    new_card = deal_card(deck)
-    dealer_cards << new_card
-    puts "=> Dealer gets #{new_card}. Now dealer has #{get_hand_value(dealer_cards)}."
-  end
-  
-  if get_hand_value(dealer_cards) > 21
-    puts "=> Dealer is bust. You win!"
-    break
-  end
-  
-  if get_hand_value(dealer_cards) == 21
-    puts "=> Dealer wins with 21!"
-    break
-  end
-end until get_hand_value(dealer_cards) >= 17
 
-# end game
-if get_hand_value(player_cards) < 21 && get_hand_value(dealer_cards) < 21
-  puts "=> You have #{get_hand_value(player_cards)} and dealer has #{get_hand_value(dealer_cards)}."
+  begin
+    break if get_hand_value(player_cards) >= 21
   
-  if get_hand_value(player_cards) > get_hand_value(dealer_cards)
-    puts "=> You win!" 
-  end
+    if get_hand_value(dealer_cards) < 17
+      puts "=> Dealer hits."
+      new_card = deal_card(deck)
+      dealer_cards << new_card
+      puts "=> Dealer gets a #{new_card}. Now dealer has #{get_hand_value(dealer_cards)}."
+    end
   
-  if get_hand_value(dealer_cards) >= get_hand_value(player_cards)
-    puts "=> Dealer wins" 
-  end
-end
+    if get_hand_value(dealer_cards) > 21
+      puts "=> Dealer is bust. You win!"
+      break
+    end
+  
+    if get_hand_value(dealer_cards) == 21
+      puts "=> Dealer wins with 21!"
+      break
+    end
+    
+    if get_hand_value(dealer_cards).between?(17, 21)
+      puts "=> Dealer stays on #{get_hand_value(dealer_cards)}."
+    end
+    
+  end until get_hand_value(dealer_cards) >= 17
 
+  # end game
+  if get_hand_value(player_cards) < 21 && get_hand_value(dealer_cards) < 21
+    puts "=> You have #{get_hand_value(player_cards)} and dealer has #{get_hand_value(dealer_cards)}."
+  
+    if get_hand_value(player_cards) > get_hand_value(dealer_cards)
+      puts "=> You win!" 
+    end
+  
+    if get_hand_value(dealer_cards) >= get_hand_value(player_cards)
+      puts "=> Dealer wins" 
+    end
+  end
+
+  puts "=> Do you want to play again? (y/n)"
+  play_again = gets.chomp
+end until play_again.downcase == 'n'
+
+puts "=> Thanks for playing!"
