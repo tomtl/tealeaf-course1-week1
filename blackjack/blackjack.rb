@@ -27,37 +27,39 @@ def get_card_value(card)
   (1..9).each { |number| card_values[number] = number }
   ["J", "Q", "K"].each { |letter| card_values[letter] = 10 }
   card_values["A"] = 11
-  card_values
+  card_values[card]
 end
 
 def get_hand_value(cards)
   value = 0
-  cards.each { |card| value += card_values[card] }
+  cards.each { |card| value += get_card_value(card) }
   value
   # if value ace and over 21, subtract 10
 end # returns the numerical value of hand, eg: 17.
 
-create_deck
 
-player_cards = []
-dealer_cards = []
+puts "=> Welcome to Blackjack! Let's get started."
+
+deck = create_deck
 
 # initial deal
+player_cards = []
+dealer_cards = []
 2.times do
   player_cards << deal_card(deck)
   dealer_cards << deal_card(deck)
 end
 
 # show user cards
-puts "=> you have a #{player_cards[0]} and a #{player_cards[1]}."
+puts "=> You have a #{player_cards[0]} and a #{player_cards[1]}."
 puts "=> Dealer's first card is a #{dealer_cards[0]}"
 
 # ask if user wants to hit
 begin
   puts "=> Would you like to hit? (y/n)"
   hit = gets.chomp
-  break if hit == 'y'
+  break if hit == 'n'
   player_cards << deal_card(deck)
-  puts "Now your cards are #{player_cards}, which equals #{get_hand_value(cards)}."
+  puts "Now your cards are #{player_cards}, which equals #{get_hand_value(player_cards)}."
   # check value of player's cards, win/bust if 21 >.
-end while hit == "y"
+end until hit == "n"
