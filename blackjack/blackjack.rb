@@ -1,16 +1,18 @@
+require 'pry'
 
-def create_deck
+def create_deck 
   deck = []
   8.times do 
     (2..10).each { |value| deck << value }
     ["J", "Q", "K", "A"].each { |value| deck << value }
   end
-  deck
-end # returns deck as array like [1, 2, 3].
+  deck # returns deck as array like [1, 2, 3].
+end 
 
-def deal_card(deck)
+def deal_card(deck) 
   deck.delete_at(rand(deck.length))
-end # returns one card, eg: '1' or 'K'.
+  # returns one card, eg: '1' or 'K'.
+end 
 
 def get_card_value(card)
   card_values = {
@@ -18,20 +20,42 @@ def get_card_value(card)
     6 => 6, 7 => 7, 8 => 8, 9 => 9, 10 => 10, 
     "J" => 10, "Q" => 10, "K" => 10, "A" => 11
   }
-  card_values[card]
-end # returns that number value of a card, eg: 5
+  card_values[card] # returns that number value of a card, eg: 5
+end 
 
 def get_hand_value(cards)
   value = 0
   cards.each { |card| value += get_card_value(card) }
-  if cards.include?("A")
-    while value > 21 && cards.count("A") > 0
-      value -= 10
-      cards.delete_at(cards.find_index("A"))
+
+  if value > 21 && cards.count("A") > 0
+    cards_no_aces = cards.select { |card| card != "A" }
+
+    value_no_aces = 0
+    if cards_no_aces.count > 0
+      cards_no_aces.each { |card| value_no_aces += get_card_value(card) }
+    end
+
+    aces_count = cards.count("A")
+    value_aces = aces_count * 11
+
+    while aces_count > 0
+      aces_count -= 1
+      value_aces -= 10
+      value = value_no_aces + value_aces
+        
+      if value <= 21
+        return value
+        break
+      elsif aces_count == 0
+        return value
+        break
+      end
+      
     end
   end
-  value
-end # returns the numerical value of hand, eg: 17.
+
+  value # returns the numerical value of hand, eg: 17.
+end
 
 begin
   puts "=> Welcome to Blackjack! Let's get started."
@@ -77,14 +101,13 @@ begin
       puts "=> Bust. You lost."
       break
     end
-  
   end until hit == "n"
  
 
   # dealer's turn
   puts "=> Dealer's cards are #{dealer_cards} which equals #{get_hand_value(dealer_cards)}."
 
-  begin
+  while get_hand_value(dealer_cards) < 17
     break if get_hand_value(player_cards) >= 21
   
     if get_hand_value(dealer_cards) < 17
@@ -107,8 +130,7 @@ begin
     if get_hand_value(dealer_cards).between?(17, 21)
       puts "=> Dealer stays on #{get_hand_value(dealer_cards)}."
     end
-    
-  end until get_hand_value(dealer_cards) >= 17
+  end
 
   # end game
   if get_hand_value(player_cards) < 21 && get_hand_value(dealer_cards) < 21
